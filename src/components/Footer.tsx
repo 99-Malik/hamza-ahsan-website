@@ -1,195 +1,154 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, Clock } from "lucide-react";
-import { siteConfig, companies } from "@/config/siteConfig";
-import Image from "next/image";
-import { useParams } from "next/navigation";
-
-type Theme = {
-  bg: string;        // footer background
-  fg: string;        // footer foreground (text)
-  accent: string;    // brand accent (icons, pills, links)
-  soft: string;      // subtle brand-tinted bg
-  border: string;    // divider/border color
-};
-
-const THEMES: Record<string, Theme> = {
-  // lg: {
-  //   bg: "#3A0010",                  // deep LG maroon base
-  //   fg: "#FFFFFF",
-  //   accent: "#A50034",              // LG
-  //   soft: "rgba(165,0,52,0.12)",
-  //   border: "rgba(165,0,52,0.28)",
-  // },
-  // bosch: {
-  //   bg: "#7A0000",                  // deep Bosch red base
-  //   fg: "#FFFFFF",
-  //   accent: "#F80000",              // Bosch
-  //   soft: "rgba(248,0,0,0.12)",
-  //   border: "rgba(248,0,0,0.28)",
-  // },
-  // siemens: {
-  //   bg: "#003F3E",                  // deep Siemens teal base
-  //   fg: "#FFFFFF",
-  //   accent: "#019997",              // Siemens
-  //   soft: "rgba(1,153,151,0.12)",
-  //   border: "rgba(1,153,151,0.28)",
-  // },
-  // samsung: {
-  //   bg: "#000000",                  // Samsung black
-  //   fg: "#FFFFFF",
-  //   accent: "#000000",              // keep accent black on light elems; we’ll invert with border/soft
-  //   soft: "rgba(255,255,255,0.08)", // subtle neutral for chips
-  //   border: "rgba(255,255,255,0.18)",
-  // },
-};
+import Link from "next/link";
+import { Facebook, Instagram, Twitter, MapPin, Phone, Mail, Clock, ArrowRight, Heart } from "lucide-react";
+import { siteConfig, services } from "@/config/siteConfig";
 
 export function Footer() {
-  const params = useParams() as { company?: string | string[] };
-  // const currentCompany = Array.isArray(params?.company) ? params.company[0] : params?.company;
-  const currentCompany = "";
-  const currentCompanyData = currentCompany
-    ? companies.find((c) => c.id === currentCompany)
-    : null;
+  const currentYear = new Date().getFullYear();
 
-  const theme: Theme =
-    (currentCompany && THEMES[currentCompany]) || {
-      // Neutral default for `/`
-      bg: "#111827",               // gray-900
-      fg: "#FFFFFF",
-      accent: "var(--primary)",
-      soft: "rgba(59,130,246,0.10)", // blue-500 soft
-      border: "rgba(255,255,255,0.16)",
-    };
+  const socialLinks = [
+    { icon: Facebook, href: "#", label: "Facebook" },
+    { icon: Instagram, href: "#", label: "Instagram" },
+    { icon: Twitter, href: "#", label: "Twitter" },
+  ];
 
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) element.scrollIntoView({ behavior: "smooth" });
-  };
+  const quickLinks = [
+    { name: "Home", href: "/" },
+    { name: "About Us", href: "#about" },
+    { name: "Services", href: "#services" },
+    { name: "Testimonials", href: "#testimonials" },
+    { name: "Contact", href: "#contact" },
+  ];
 
   return (
-    <footer
-      className="relative"
-      style={{ backgroundColor: theme.bg, color: theme.fg }}
-    >
-      <div className="container mx-auto px-4 py-12">
-        {/* Brand pill */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-          className="mb-6"
-        >
-          <span
-            className="inline-block text-[11px] md:text-xs font-bold tracking-wider px-3 py-1 rounded-full"
-            style={{
-              backgroundColor: theme.soft,
-              border: `1px solid ${theme.border}`,
-              color: "#fff",
-            }}
-          >
-            {currentCompanyData
-              ? `AUTHORISED SERVICE CENTER – ${currentCompanyData.name.toUpperCase()}`
-              : `APPLIANCE SERVICE CENTER AE`}
-          </span>
-        </motion.div>
+    <footer className="bg-slate-950 pt-20 pb-10 border-t border-white/10 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/5 rounded-full blur-[100px]" />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-500/5 rounded-full blur-[100px]" />
+      </div>
 
-        <div className="flex flex-col gap-8">
-          {/* Company Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              {currentCompanyData ? (
-                <Image
-                  src={currentCompanyData.logo}
-                  alt={`${currentCompanyData.name} logo`}
-                  className="h-8 w-32 object-contain"
-                  width={100}
-                  height={100}
-                />
-              ) : (
-                <h3
-                  className="text-xl font-bold"
-                  style={{ color: "#FFFFFF" }}
-                >
-                  Appliance Service Center AE
-                </h3>
-              )}
-            </div>
-
-            <p className="mb-5" style={{ color: "rgba(255,255,255,0.80)" }}>
-              Professional appliance repair services in {siteConfig.locations}.
-              Expert technicians, genuine parts, and guaranteed satisfaction.
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+          {/* Brand Column */}
+          <div className="space-y-6">
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300">
+                <span className="text-white font-display font-bold text-xl">A</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-lg font-display font-bold text-white leading-none">
+                  Appliance
+                </span>
+                <span className="text-sm text-slate-400 leading-none tracking-wide">
+                  Repair Website
+                </span>
+              </div>
+            </Link>
+            <p className="text-slate-400 leading-relaxed">
+              Professional appliance repair services in {siteConfig.locations}. Fast, reliable, and guaranteed satisfaction.
             </p>
-
-            {/* Contacts */}
-            <div className="flex flex-col space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4" style={{ color: theme.accent }} />
-                <span>{siteConfig.phoneNumber}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4" style={{ color: theme.accent }} />
-                <span>{siteConfig.email}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" style={{ color: theme.accent }} />
-                <span>{siteConfig.locations}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" style={{ color: theme.accent }} />
-                <span>{siteConfig.workingHours}</span>
-              </div>
+            <div className="flex gap-4">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all duration-300"
+                  aria-label={social.label}
+                >
+                  <social.icon className="w-5 h-5" />
+                </a>
+              ))}
             </div>
-          </motion.div>
+          </div>
 
-          {/* Quick links (optional) */}
-          <nav className="flex flex-wrap gap-4 text-sm mt-2">
-            {[
-              { name: "Home", href: "#hero" },
-              { name: "About", href: "#about" },
-              { name: "Services", href: "#services" },
-              { name: "Testimonials", href: "#testimonials" },
-              { name: "Contact", href: "#contact" },
-            ].map((item) => (
-              <button
-                key={item.href}
-                onClick={() => scrollToSection(item.href)}
-                className="transition-colors"
-                style={{ color: "rgba(255,255,255,0.90)" }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.color = theme.accent;
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.90)";
-                }}
-              >
-                {item.name}
-              </button>
-            ))}
-          </nav>
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-white font-bold text-lg mb-6">Quick Links</h4>
+            <ul className="space-y-4">
+              {quickLinks.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-slate-400 hover:text-primary flex items-center gap-2 group transition-colors"
+                  >
+                    <ArrowRight className="w-4 h-4 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Services */}
+          <div>
+            <h4 className="text-white font-bold text-lg mb-6">Our Services</h4>
+            <ul className="space-y-4">
+              {services.slice(0, 5).map((service) => (
+                <li key={service.name}>
+                  <Link
+                    href="#services"
+                    className="text-slate-400 hover:text-primary flex items-center gap-2 group transition-colors"
+                  >
+                    <ArrowRight className="w-4 h-4 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
+                    {service.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h4 className="text-white font-bold text-lg mb-6">Contact Us</h4>
+            <ul className="space-y-6">
+              <li className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 text-primary">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Phone Number</p>
+                  <a href={`tel:${siteConfig.phoneNumber}`} className="text-white hover:text-primary transition-colors font-medium">
+                    {siteConfig.phoneNumber}
+                  </a>
+                </div>
+              </li>
+              <li className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 text-primary">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Email Address</p>
+                  <a href={`mailto:${siteConfig.email}`} className="text-white hover:text-primary transition-colors font-medium">
+                    {siteConfig.email}
+                  </a>
+                </div>
+              </li>
+              <li className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 text-primary">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Location</p>
+                  <p className="text-slate-300">{siteConfig.locations}</p>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        {/* Bottom bar */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          viewport={{ once: true }}
-          className="mt-8 pt-6 text-center"
-          style={{ borderTop: `1px solid ${theme.border}`, color: "rgba(255,255,255,0.80)" }}
-        >
-          <p>
-            &copy; 2025 {currentCompanyData?.name || "Appliance Service Center AE"}. All rights reserved.
-            {" "} | Professional Authorised Service Center in UAE
+        {/* Bottom Bar */}
+        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-slate-500 text-sm text-center md:text-left">
+            © {currentYear} Appliance Repair Website. All rights reserved.
           </p>
-        </motion.div>
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <span>Made with</span>
+            <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" />
+            <span>in Dubai</span>
+          </div>
+        </div>
       </div>
     </footer>
   );

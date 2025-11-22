@@ -1,17 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, MessageCircle, X, Plus } from "lucide-react";
-import { Button } from "./ui/button";
+import { Phone, MessageCircle, X } from "lucide-react";
 import { makePhoneCall, openWhatsApp } from "../utils/contactActions";
-import Image from "next/image";
 
 export function FloatingContactButtons() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showPulse, setShowPulse] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setShowPulse((prev) => !prev);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
+    setShowPulse(false);
   };
 
   return (
@@ -25,62 +32,63 @@ export function FloatingContactButtons() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0, y: 20 }}
               transition={{ duration: 0.2, delay: 0.1 }}
-              className="mb-4"
+              className="mb-4 relative group"
             >
-              <Button
+              <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-white border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+                WhatsApp Us
+              </span>
+              <button
                 onClick={() => openWhatsApp()}
-                className="w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0"
-                size="sm"
+                className="w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg shadow-green-500/30 hover:scale-110 transition-transform duration-300"
               >
-                <Image width={30} height={30} alt="icon" src="/whatsapp.svg" />
-              </Button>
-              <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-black/80 text-white px-3 py-1 rounded text-sm whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity pointer-events-none">
-                WhatsApp
-              </div>
+                <MessageCircle className="w-7 h-7 text-white" />
+              </button>
             </motion.div>
 
-            {/* Phone Button */}
+            {/* Call Button */}
             <motion.div
               initial={{ opacity: 0, scale: 0, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0, y: 20 }}
-              transition={{ duration: 0.2, delay: 0.05 }}
-              className="mb-4"
+              transition={{ duration: 0.2 }}
+              className="mb-4 relative group"
             >
-              <Button
-                onClick={makePhoneCall}
-                className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 border-0"
-                size="sm"
-              >
-                <Phone className="size-8" />
-              </Button>
-              <div className="absolute right-16 top-1/2 -translate-y-1/2 bg-black/80 text-white px-3 py-1 rounded text-sm whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity pointer-events-none">
+              <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-white border border-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
                 Call Now
-              </div>
+              </span>
+              <button
+                onClick={() => makePhoneCall()}
+                className="w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-blue-500/30 hover:scale-110 transition-transform duration-300"
+              >
+                <Phone className="w-7 h-7 text-white" />
+              </button>
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
       {/* Main Toggle Button */}
-      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-        <Button
-          onClick={toggleExpanded}
-          className="w-16 h-16 rounded-full bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-lg hover:shadow-xl transition-all duration-300 border-0"
-          size="sm"
+      <motion.button
+        onClick={toggleExpanded}
+        className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center shadow-xl shadow-slate-900/30 relative z-10 hover:scale-105 transition-transform duration-300"
+        whileTap={{ scale: 0.95 }}
+      >
+        {/* Pulse Effect */}
+        {!isExpanded && showPulse && (
+          <span className="absolute inset-0 rounded-full bg-slate-900 animate-ping opacity-20" />
+        )}
+
+        <motion.div
+          animate={{ rotate: isExpanded ? 90 : 0 }}
+          transition={{ duration: 0.2 }}
         >
-          <motion.div
-            animate={{ rotate: isExpanded ? 45 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {isExpanded ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Plus className="w-6 h-6" />
-            )}
-          </motion.div>
-        </Button>
-      </motion.div>
+          {isExpanded ? (
+            <X className="w-7 h-7 text-white" />
+          ) : (
+            <Phone className="w-7 h-7 text-white" />
+          )}
+        </motion.div>
+      </motion.button>
     </div>
   );
 }

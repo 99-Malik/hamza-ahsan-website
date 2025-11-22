@@ -11,14 +11,14 @@ export default async function App({
 }) {
   const currentCompany = (await params).company;
 
-  
+
   return (
     <>
-      <HeroSection currentCompany={currentCompany} />
-      <AboutSection currentCompany={currentCompany} />
-      <ServicesSection currentCompany={currentCompany} />
+      <HeroSection />
+      <AboutSection />
+      <ServicesSection />
       <TestimonialsSection />
-      <ContactSection currentCompany={currentCompany} />
+      <ContactSection />
     </>
   );
 }

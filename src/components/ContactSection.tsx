@@ -1,240 +1,245 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Phone } from "lucide-react";
-import { Button } from "./ui/button";
-import { siteConfig, services, companies } from "@/config/siteConfig";
+import { Phone, Mail, MapPin, Clock, Send, MessageCircle, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { siteConfig } from "@/config/siteConfig";
 import { makePhoneCall, openWhatsApp } from "../utils/contactActions";
-import Image from "next/image";
+import { useState } from "react";
 
-interface ContactSectionProps {
-  currentCompany?: string;
-}
+const formSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  phone: z.string().min(10, "Please enter a valid phone number"),
+  service: z.string().min(1, "Please select a service"),
+  message: z.string().optional(),
+});
 
-type Theme = {
-  accent: string;        // main brand color
-  accentSoft: string;    // soft background tint
-  border: string;        // border tint
-  overlay: string;       // dark overlay gradient for the CTA panel
-};
+type FormData = z.infer<typeof formSchema>;
 
-const THEMES: Record<string, Theme> = {
-  // lg: {
-  //   accent: "#A50034",
-  //   accentSoft: "rgba(165,0,52,0.10)",
-  //   border: "rgba(165,0,52,0.25)",
-  //   overlay:
-  //     "linear-gradient(120deg, rgba(165,0,52,0.85) 0%, rgba(50,0,16,0.85) 45%, rgba(0,0,0,0.85) 100%)",
-  // },
-  // bosch: {
-  //   accent: "#F80000",
-  //   accentSoft: "rgba(248,0,0,0.10)",
-  //   border: "rgba(248,0,0,0.25)",
-  //   overlay:
-  //     "linear-gradient(120deg, rgba(248,0,0,0.88) 0%, rgba(112,0,0,0.86) 50%, rgba(0,0,0,0.84) 100%)",
-  // },
-  // siemens: {
-  //   accent: "#019997",
-  //   accentSoft: "rgba(1,153,151,0.10)",
-  //   border: "rgba(1,153,151,0.25)",
-  //   overlay:
-  //     "linear-gradient(120deg, rgba(1,153,151,0.88) 0%, rgba(0,72,71,0.86) 50%, rgba(0,0,0,0.84) 100%)",
-  // },
-  // samsung: {
-  //   accent: "#000000",
-  //   accentSoft: "rgba(0,0,0,0.06)",
-  //   border: "rgba(0,0,0,0.20)",
-  //   overlay:
-  //     "linear-gradient(120deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.88) 50%, rgba(0,0,0,0.84) 100%)",
-  // },
-};
+export function ContactSection() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-export function ContactSection({ currentCompany }: ContactSectionProps) {
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    service: "",
-    message: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
   });
 
-  const currentCompanyData = currentCompany
-    ? companies.find((c) => c.id === currentCompany)
-    : null;
+  const onSubmit = async (data: FormData) => {
+    setIsSubmitting(true);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  const availableServices = currentCompany
-    ? services.filter((s) => s.availableFor.includes(currentCompany))
-    : services;
+    // Construct WhatsApp message
+    const message = `New Service Request:
+Name: ${data.name}
+Phone: ${data.phone}
+Service: ${data.service}
+Message: ${data.message || "N/A"}`;
 
-  const theme = useMemo<Theme>(() => {
-    if (currentCompany && THEMES[currentCompany]) return THEMES[currentCompany];
-    return {
-      accent: "var(--primary)",
-      accentSoft: "rgba(59,130,246,0.08)",
-      border: "rgba(59,130,246,0.25)",
-      overlay:
-        "linear-gradient(120deg, rgba(31,41,55,0.9) 0%, rgba(17,24,39,0.88) 50%, rgba(0,0,0,0.85) 100%)",
-    };
-  }, [currentCompany]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const whatsappMessage = `Hey! I want Home Appliance Repair Services\n\nName: ${formData.name}\nPhone: ${formData.phone}\nService: ${
-      availableServices.find((s) => s.id === formData.service)?.name || "Not specified"
-    }\nMessage: ${formData.message}`;
-    openWhatsApp(whatsappMessage);
-    alert("Thank you for your inquiry! We will contact you shortly.");
+    openWhatsApp(message);
+    setIsSubmitting(false);
+    reset();
   };
 
-  const handleChange = (field: string, value: string) =>
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const contactInfo = [
+    {
+      icon: Phone,
+      title: "Call Us Directly",
+      value: siteConfig.phoneNumber,
+      action: () => makePhoneCall(),
+      color: "text-blue-400",
+      bg: "bg-blue-500/10",
+    },
+    {
+      icon: MessageCircle,
+      title: "WhatsApp Chat",
+      value: "Chat with us",
+      action: () => openWhatsApp(),
+      color: "text-green-400",
+      bg: "bg-green-500/10",
+    },
+    {
+      icon: Mail,
+      title: "Email Us",
+      value: siteConfig.email,
+      action: () => window.location.href = `mailto:${siteConfig.email}`,
+      color: "text-purple-400",
+      bg: "bg-purple-500/10",
+    },
+    {
+      icon: MapPin,
+      title: "Service Area",
+      value: siteConfig.locations,
+      action: null,
+      color: "text-orange-400",
+      bg: "bg-orange-500/10",
+    },
+  ];
 
   return (
-    <section id="contact" className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-10"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            {/* Contact {currentCompanyData?.name || "Our"} Service Center */}
-            Contact Our Appliance Repair Center
+    <section id="contact" className="py-20 lg:py-32 bg-slate-900 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px]" />
+      </div>
+
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 mb-6"
+          >
+            <Clock className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium text-primary">24/7 Availability</span>
+          </motion.div>
+          <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-6">
+            Get Your Appliance <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">
+              Fixed Today
+            </span>
           </h2>
-          <p className="text-lg text-neutral-600 max-w-3xl mx-auto">
-            Get in touch with our expert technicians for professional{" "}
-            {currentCompanyData?.name || "appliance"} repair services in {siteConfig.locations}.
+          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+            Fast, reliable service when you need it most. Contact us now for a free quote or immediate repair.
           </p>
-        </motion.div>
+        </div>
 
-        {/* Brand-tinted CTA panel (so hero-style buttons are readable) */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="rounded-2xl p-6 md:p-8 mb-12 text-white"
-          style={{
-            backgroundImage: theme.overlay,
-            border: `1px solid ${theme.border}`,
-          }}
-        >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-center md:text-left">
-              <div
-                className="inline-block text-xs font-bold tracking-wider px-3 py-1 rounded-full mb-3"
-                style={{ backgroundColor: theme.accentSoft, border: `1px solid ${theme.border}` }}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          {/* Contact Info Cards */}
+          <div className="lg:col-span-1 space-y-6">
+            {contactInfo.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+                onClick={item.action || undefined}
+                className={`p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 cursor-pointer group ${!item.action && "cursor-default"}`}
               >
-                AUTHORISED SERVICE CENTER {currentCompanyData?.name ? `– ${currentCompanyData.name.toUpperCase()}` : ""}
-              </div>
-              <h3 className="text-2xl md:text-3xl font-semibold leading-tight">
-                Need help right now? Our team is ready.
-              </h3>
-              <p className="mt-1 text-white/80">
-                Same-day service • Genuine parts • Licensed technicians
-              </p>
-            </div>
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                    <item.icon className={`w-6 h-6 ${item.color}`} />
+                  </div>
+                  <div>
+                    <h3 className="text-slate-400 text-sm font-medium mb-1">{item.title}</h3>
+                    <p className="text-white font-bold text-lg">{item.value}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
 
-            {/* Buttons: EXACT hero styles */}
-            <div className="flex gap-3 w-full md:w-auto">
-              {/* Call: solid brand color, white text */}
+            {/* Emergency Banner */}
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/20 mt-8">
+              <h4 className="text-orange-400 font-bold mb-2 flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                Need Immediate Help?
+              </h4>
+              <p className="text-slate-300 text-sm mb-4">
+                Our emergency team is on standby 24/7 for urgent repairs.
+              </p>
               <button
                 onClick={() => makePhoneCall()}
-                className="px-6 py-3 rounded-md font-semibold text-white w-full md:w-auto"
-                style={{ backgroundColor: theme.accent }}
+                className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold transition-colors shadow-lg shadow-orange-500/20"
               >
-                Call Us
-              </button>
-
-              {/* WhatsApp: transparent with WHITE border/text */}
-              <button
-                onClick={() => openWhatsApp()}
-                className="px-6 py-3 rounded-md font-semibold w-full md:w-auto"
-                style={{ color: "#ffffff", border: "1px solid #ffffff", backgroundColor: "transparent" }}
-              >
-                WhatsApp Us
+                Call Emergency Line
               </button>
             </div>
           </div>
-        </motion.div>
 
-        {/* (Optional) If you add a form below, keep brand accents consistent */}
-        {/* Example input focus ring and button styles */}
-        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              className="w-full rounded-md border px-4 py-3"
-              placeholder="Your Name"
-              value={formData.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-              style={{ borderColor: theme.border }}
-            />
-            <input
-              className="w-full rounded-md border px-4 py-3"
-              placeholder="Phone"
-              value={formData.phone}
-              onChange={(e) => handleChange("phone", e.target.value)}
-              style={{ borderColor: theme.border }}
-            />
-            <input
-              className="w-full rounded-md border px-4 py-3 md:col-span-2"
-              placeholder="Email"
-              value={formData.email}
-              onChange={(e) => handleChange("email", e.target.value)}
-              style={{ borderColor: theme.border }}
-            />
-            <input
-              className="w-full rounded-md border px-4 py-3 md:col-span-2"
-              placeholder="Service (e.g. Washing Machine Repair)"
-              value={formData.service}
-              onChange={(e) => handleChange("service", e.target.value)}
-              style={{ borderColor: theme.border }}
-            />
-            <textarea
-              className="w-full rounded-md border px-4 py-3 md:col-span-2 min-h-[120px]"
-              placeholder="Message"
-              value={formData.message}
-              onChange={(e) => handleChange("message", e.target.value)}
-              style={{ borderColor: theme.border }}
-            />
-          </div>
+          {/* Contact Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="lg:col-span-2"
+          >
+            <div className="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-12 backdrop-blur-md">
+              <h3 className="text-2xl font-bold text-white mb-8">Request a Service</h3>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">Your Name</label>
+                    <input
+                      {...register("name")}
+                      className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                      placeholder="John Doe"
+                    />
+                    {errors.name && (
+                      <p className="text-red-400 text-xs">{errors.name.message}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">Phone Number</label>
+                    <input
+                      {...register("phone")}
+                      className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                      placeholder="050 123 4567"
+                    />
+                    {errors.phone && (
+                      <p className="text-red-400 text-xs">{errors.phone.message}</p>
+                    )}
+                  </div>
+                </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
-            {/* Call: solid brand */}
-            <button
-              type="button"
-              onClick={() => makePhoneCall()}
-              className="px-6 py-3 rounded-md font-semibold text-white w-full sm:w-auto"
-              style={{ backgroundColor: theme.accent }}
-            >
-              Call Us
-            </button>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Service Needed</label>
+                  <select
+                    {...register("service")}
+                    className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  >
+                    <option value="" className="bg-slate-900">Select a service...</option>
+                    <option value="Washing Machine" className="bg-slate-900">Washing Machine Repair</option>
+                    <option value="Refrigerator" className="bg-slate-900">Refrigerator Repair</option>
+                    <option value="Dishwasher" className="bg-slate-900">Dishwasher Repair</option>
+                    <option value="AC Repair" className="bg-slate-900">AC Repair</option>
+                    <option value="Oven/Stove" className="bg-slate-900">Oven/Store Repair</option>
+                    <option value="Other" className="bg-slate-900">Other</option>
+                  </select>
+                  {errors.service && (
+                    <p className="text-red-400 text-xs">{errors.service.message}</p>
+                  )}
+                </div>
 
-            {/* WhatsApp: transparent with WHITE border/text (keeps hero style).
-                If you keep it on a white background and want more contrast,
-                switch to brand border/text instead. */}
-            <button
-              type="button"
-              onClick={() => openWhatsApp()}
-              className="px-6 py-3 rounded-md font-semibold w-full sm:w-auto"
-              style={{ color: "#111827", border: `1px solid ${theme.border}`, backgroundColor: "transparent" }}
-            >
-              WhatsApp Us
-            </button>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">Message (Optional)</label>
+                  <textarea
+                    {...register("message")}
+                    rows={4}
+                    className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none"
+                    placeholder="Describe your issue..."
+                  />
+                </div>
 
-            <button
-              type="submit"
-              className="px-6 py-3 rounded-md font-semibold text-white w-full sm:w-auto"
-              style={{ backgroundColor: theme.accent }}
-            >
-              Send Request
-            </button>
-          </div>
-        </form>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-4 bg-primary hover:bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/25 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5" />
+                      Send Request
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

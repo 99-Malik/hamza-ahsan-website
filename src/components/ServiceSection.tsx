@@ -1,389 +1,201 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Phone, CheckCircle, MessageCircle } from "lucide-react";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Phone, MessageCircle, ArrowRight, Wrench, Clock, Shield, Star } from "lucide-react";
+import { Card, CardContent } from "./ui/card";
 import { ImageWithFallback } from "@/components/ImageWithFallback";
-import { siteConfig, services, companies } from "@/config/siteConfig";
+import { siteConfig, services } from "@/config/siteConfig";
 import { makePhoneCall, openWhatsApp } from "../utils/contactActions";
-import Image from "next/image";
 
-interface ServicesSectionProps {
-  currentCompany?: string;
-}
-
-type Theme = {
-  accent: string;        // main brand color
-  accentSoft: string;    // subtle bg/border tint
-  border: string;        // border color
-};
-
-const THEMES: Record<string, Theme> = {
-  // lg:      { accent: "#A50034", accentSoft: "rgba(165,0,52,0.10)", border: "rgba(165,0,52,0.25)" },
-  // bosch:   { accent: "#F80000", accentSoft: "rgba(248,0,0,0.10)",  border: "rgba(248,0,0,0.25)" },
-  // siemens: { accent: "#019997", accentSoft: "rgba(1,153,151,0.10)", border: "rgba(1,153,151,0.25)" },
-  // samsung: { accent: "#000000", accentSoft: "rgba(0,0,0,0.06)",     border: "rgba(0,0,0,0.20)" },
-};
-
-export function ServicesSection({ currentCompany }: ServicesSectionProps) {
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  const currentCompanyData = currentCompany
-    ? companies.find((c) => c.id === currentCompany)
-    : null;
-
-  const theme: Theme = useMemo(() => {
-    if (currentCompany && THEMES[currentCompany]) return THEMES[currentCompany];
-    return { accent: "var(--primary)", accentSoft: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.25)" };
-  }, [currentCompany]);
-
-  const availableServices = currentCompany
-    ? services.filter((service) => service.availableFor.includes(currentCompany))
-    : services;
-
-  const itemsPerSlide = 3;
-  const totalSlides = Math.ceil(availableServices.length / itemsPerSlide);
-
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % totalSlides);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
-
-  const currentServices = availableServices.slice(
-    currentSlide * itemsPerSlide,
-    (currentSlide + 1) * itemsPerSlide
-  );
+export function ServicesSection() {
+  const [hoveredService, setHoveredService] = useState<number | null>(null);
 
   const handleServiceWhatsApp = (serviceName: string) => {
-    openWhatsApp(`Hey! I want ${serviceName}. Please contact me for service.`);
+    openWhatsApp(`Hello! I'm interested in ${serviceName} service. Please contact me.`);
   };
 
-  useEffect(() => {
-    if (totalSlides <= 1) return;
-    const interval = setInterval(() => setCurrentSlide((prev) => (prev + 1) % totalSlides), 3000);
-    return () => clearInterval(interval);
-  }, [totalSlides]);
+  const processSteps = [
+    {
+      number: "01",
+      title: "Book Appointment",
+      description: "Schedule your service online or call us directly. We offer flexible timing to suit your needs.",
+      icon: Clock,
+    },
+    {
+      number: "02",
+      title: "Expert Diagnosis",
+      description: "Our certified technician will inspect your appliance and provide a detailed, transparent quote.",
+      icon: Wrench,
+    },
+    {
+      number: "03",
+      title: "Professional Repair",
+      description: "We fix your appliance using genuine parts and provide comprehensive warranty coverage.",
+      icon: Shield,
+    },
+  ];
 
   return (
-    <section id="services" className="py-20 bg-white">
-      <div className="container mx-auto px-4">
+    <section id="services" className="py-20 lg:py-32 bg-slate-950 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-orange-500/10 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="container mx-auto px-6 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            {/* {currentCompanyData?.name || "Professional"} Repair Services */}
-            Professional Repair Services
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-            {/* {currentCompanyData
-              ? `Comprehensive ${currentCompanyData.name} appliance repair services in ${siteConfig.locations} with certified technicians and genuine parts.`
-              : `Expert repair services for all major home appliances in ${siteConfig.locations}. Professional technicians, genuine parts, and warranty included.`} */}
-              Expert repair services for all major home appliances in {siteConfig.locations}. Professional technicians, genuine parts.
-          </p>
-
-          {/* Quick Contact Buttons (brand-aligned like hero, adapted for light bg) */}
-          <div className="flex justify-center gap-3">
-            {/* Call: solid brand, white text */}
-            <button
-              onClick={() => makePhoneCall()}
-              className="px-6 py-3 rounded-md font-semibold text-white transition-shadow shadow-sm"
-              style={{ backgroundColor: theme.accent }}
-            >
-              Call Us
-            </button>
-
-            {/* WhatsApp: transparent with brand border/text (hero uses white; here we adapt for visibility) */}
-            <button
-              onClick={() => openWhatsApp()}
-              className="px-6 py-3 rounded-md font-semibold transition-colors"
-              style={{
-                color: theme.accent,
-                border: `1px solid ${theme.border}`,
-                backgroundColor: "transparent",
-              }}
-            >
-              WhatsApp Us
-            </button>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 mb-6">
+            <Star className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium text-primary">Our Expertise</span>
           </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-6">
+            Professional Appliance <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">
+              Repair Services
+            </span>
+          </h2>
+          <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            Expert repair solutions for all your home appliances in {siteConfig.locations}. Professional technicians, genuine parts, and guaranteed satisfaction.
+          </p>
         </motion.div>
 
-        {/* Services Slider */}
-        <div className="relative hidden sm:block">
-          {/* Navigation */}
-          <div className="flex justify-center gap-4 mb-8">
-            <button
-              onClick={prevSlide}
-              disabled={totalSlides <= 1}
-              className="px-3 py-2 rounded-md transition-colors"
-              style={{
-                border: `1px solid ${theme.border}`,
-                backgroundColor: "transparent",
-                color: "#111827",
-                opacity: totalSlides <= 1 ? 0.5 : 1,
-              }}
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
+          {services.map((service, index) => (
+            <motion.div
+              key={service.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              viewport={{ once: true }}
+              onMouseEnter={() => setHoveredService(index)}
+              onMouseLeave={() => setHoveredService(null)}
+              className="group"
             >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            <div className="flex items-center gap-2">
-              {Array.from({ length: totalSlides }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className="h-2 rounded-full transition-all"
-                  style={{
-                    width: index === currentSlide ? 32 : 8,
-                    backgroundColor: index === currentSlide ? theme.accent : theme.accentSoft,
-                  }}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={nextSlide}
-              disabled={totalSlides <= 1}
-              className="px-3 py-2 rounded-md transition-colors"
-              style={{
-                border: `1px solid ${theme.border}`,
-                backgroundColor: "transparent",
-                color: "#111827",
-                opacity: totalSlides <= 1 ? 0.5 : 1,
-              }}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Services Grid */}
-          <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.5 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
-          >
-            {currentServices.map((service, index) => (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
-              >
-                <Card
-                  className="hover:shadow-lg transition-all duration-300 hover:-translate-y-2 h-full"
-                  style={{ borderColor: theme.border, borderWidth: 1 }}
-                >
-                  <CardHeader className="p-0">
-                    <motion.div
-                      whileHover={{ scale: 1.03 }}
-                      transition={{ duration: 0.25 }}
-                      className="relative overflow-hidden rounded-t-lg"
-                    >
-                      <ImageWithFallback
-                        src={service.image}
-                        alt={service.name}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                        width={400}
-                        height={300}
-                      />
-                      <div
-                        className="absolute top-4 left-4 text-3xl w-12 h-12 rounded-full flex items-center justify-center bg-white"
-                        style={{ boxShadow: `0 4px 18px -6px ${theme.border}`, color: theme.accent }}
-                      >
-                        {service.icon}
-                      </div>
-                    </motion.div>
-                  </CardHeader>
-
-                  <CardContent className="p-6 flex flex-col h-full">
-                    <CardTitle className="mb-3 text-xl">{service.name}</CardTitle>
-                    <CardDescription className="mb-4 flex-grow">{service.description}</CardDescription>
-
-                    <div className="mb-6">
-                      <h4 className="font-semibold mb-3 text-sm">Common Issues We Fix:</h4>
-                      <ul className="space-y-2">
-                        {service.commonIssues.slice(0, 3).map((issue, issueIndex) => (
-                          <motion.li
-                            key={issueIndex}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.3 + issueIndex * 0.1 }}
-                            className="flex items-center gap-2 text-sm"
-                          >
-                            <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: theme.accent }} />
-                            <span>{issue}</span>
-                          </motion.li>
-                        ))}
-                      </ul>
+              <Card className="h-full bg-white/5 border-white/10 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 overflow-hidden backdrop-blur-md">
+                <div className="relative overflow-hidden h-56">
+                  <ImageWithFallback
+                    src={service.image}
+                    alt={service.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    width={400}
+                    height={300}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent opacity-90" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-2xl shadow-lg mb-3 border border-white/20 group-hover:bg-primary group-hover:border-primary transition-colors duration-300">
+                      {service.icon}
                     </div>
-
-                    <div className="space-y-2 mt-auto">
-                      {/* Call: solid brand */}
-                      <button
-                        className="w-full py-2.5 rounded-md font-semibold text-white"
-                        style={{ backgroundColor: theme.accent }}
-                        onClick={() => makePhoneCall()}
-                      >
-                        Call Now
-                      </button>
-                      {/* WhatsApp: transparent with brand border/text */}
-                      <button
-                        className="w-full py-2.5 rounded-md font-semibold"
-                        style={{ color: theme.accent, border: `1px solid ${theme.border}`, backgroundColor: "transparent" }}
-                        onClick={() => handleServiceWhatsApp(service.name)}
-                      >
-                        WhatsApp
-                      </button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-
-        {/* All Services Grid (mobile) */}
-        <div className="md:hidden">
-          <div className="grid grid-cols-1 gap-6">
-            {availableServices.map((service, index) => (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
-                viewport={{ once: true }}
-              >
-                <Card className="hover:shadow-lg transition-shadow" style={{ borderColor: theme.border, borderWidth: 1 }}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2">
-                    <CardHeader className="p-0">
-                      <ImageWithFallback
-                        src={service.image}
-                        alt={service.name}
-                        className="w-full h-48 sm:h-full object-cover rounded-l-lg"
-                        width={400}
-                        height={300}
-                      />
-                    </CardHeader>
-                    <CardContent className="p-6">
-                      <CardTitle className="mb-2 flex items-center gap-2">
-                        <span className="text-2xl" style={{ color: theme.accent }}>
-                          {service.icon}
-                        </span>
-                        {service.name}
-                      </CardTitle>
-                      <CardDescription className="mb-4">{service.description}</CardDescription>
-
-                      <div className="mb-6">
-                        <h4 className="font-semibold mb-2">Common Issues:</h4>
-                        <ul className="space-y-1">
-                          {service.commonIssues.map((issue, issueIndex) => (
-                            <li key={issueIndex} className="flex items-center gap-2 text-sm">
-                              <CheckCircle className="w-3 h-3 flex-shrink-0" style={{ color: theme.accent }} />
-                              <span>{issue}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div className="space-y-2">
-                        <button
-                          className="w-full py-2.5 rounded-md font-semibold text-white"
-                          style={{ backgroundColor: theme.accent }}
-                          onClick={() => makePhoneCall()}
-                        >
-                          Call Now
-                        </button>
-                        <button
-                          className="w-full py-2.5 rounded-md font-semibold"
-                          style={{ color: theme.accent, border: `1px solid ${theme.border}`, backgroundColor: "transparent" }}
-                          onClick={() => handleServiceWhatsApp(service.name)}
-                        >
-                          WhatsApp
-                        </button>
-                      </div>
-                    </CardContent>
+                    <h3 className="text-2xl font-display font-bold text-white group-hover:text-white transition-colors duration-300">{service.name}</h3>
                   </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+                </div>
+                <CardContent className="p-6 pt-4">
+                  <p className="text-slate-400 mb-6 text-sm leading-relaxed line-clamp-2">{service.description}</p>
+
+                  <div className="mb-6 space-y-3">
+                    {service.commonIssues.slice(0, 3).map((issue, issueIndex) => (
+                      <div key={issueIndex} className="flex items-center gap-3 text-sm text-slate-300">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                        <span>{issue}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => makePhoneCall()}
+                      className="flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors duration-300 shadow-lg shadow-blue-500/20"
+                    >
+                      <Phone className="w-4 h-4" />
+                      <span>Call</span>
+                    </button>
+                    <button
+                      onClick={() => handleServiceWhatsApp(service.name)}
+                      className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 text-white font-semibold rounded-xl border border-white/10 hover:bg-white/10 transition-colors duration-300"
+                    >
+                      <MessageCircle className="w-4 h-4 text-green-500" />
+                      <span>Chat</span>
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
         </div>
 
         {/* Process Section */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="rounded-lg p-8 mt-16"
-          style={{ backgroundColor: theme.accentSoft, border: `1px solid ${theme.border}` }}
+          className="relative rounded-3xl overflow-hidden bg-slate-900 border border-white/10"
         >
-          <h3 className="text-3xl font-bold text-center mb-12">Our Service Process</h3>
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5" />
+          <div className="relative p-8 lg:p-16">
+            <div className="text-center mb-16">
+              <h3 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">
+                Simple 3-Step Process
+              </h3>
+              <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+                Getting your appliance fixed has never been easier. Follow our simple process for professional service.
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            {[
-              {
-                step: "1",
-                title: "Book Appointment",
-                description: `Call us or book online to schedule your ${currentCompanyData?.name || "appliance"} repair service at your convenience.`,
-              },
-              {
-                step: "2",
-                title: "Expert Diagnosis",
-                description: "Our certified technician will diagnose the issue and provide a free, detailed quote for the repair.",
-              },
-              {
-                step: "3",
-                title: "Professional Repair",
-                description: `We fix your appliance using genuine ${currentCompanyData?.name || "manufacturer"} parts and provide a comprehensive warranty.`,
-              },
-            ].map((process, index) => (
-              <motion.div
-                key={process.step}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2, duration: 0.6 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+              {processSteps.map((step, index) => (
                 <motion.div
-                  whileHover={{ scale: 1.06 }}
-                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                  style={{ backgroundColor: theme.accent }}
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.2, duration: 0.5 }}
+                  viewport={{ once: true }}
+                  className="relative group"
                 >
-                  <span className="text-2xl font-bold text-white">{process.step}</span>
+                  <div className="bg-white/5 rounded-2xl p-8 border border-white/10 hover:bg-white/10 transition-all duration-300 hover:-translate-y-2">
+                    <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center text-primary font-bold text-xl mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                      <step.icon className="w-8 h-8" />
+                    </div>
+                    <div className="absolute -top-4 -right-4 text-6xl font-display font-bold text-white/5 select-none">
+                      {step.number}
+                    </div>
+                    <h4 className="text-xl font-bold text-white mb-3">{step.title}</h4>
+                    <p className="text-slate-400 leading-relaxed">{step.description}</p>
+                  </div>
+                  {index < processSteps.length - 1 && (
+                    <div className="hidden md:block absolute top-1/2 -right-6 w-12 h-px bg-white/10">
+                      <ArrowRight className="w-4 h-4 text-slate-600 absolute -right-2 -top-2" />
+                    </div>
+                  )}
                 </motion.div>
-                <h4 className="text-xl font-semibold mb-2">{process.title}</h4>
-                <p className="text-muted-foreground">{process.description}</p>
-              </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          {/* Contact CTA (same style language as hero) */}
-          <div className="text-center">
-            <p className="text-lg mb-6">Ready to get started? Contact us now for immediate assistance!</p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button
-                onClick={() => makePhoneCall()}
-                className="px-6 py-3 rounded-md font-semibold text-white"
-                style={{ backgroundColor: theme.accent }}
-              >
-                Call Us
-              </button>
-              <button
-                onClick={() => openWhatsApp()}
-                className="px-6 py-3 rounded-md font-semibold"
-                style={{ color: "#ffffff", border: "1px solid #ffffff", backgroundColor: "transparent" }}
-              >
-                {/* NOTE: If you keep this on light bg, swap to brand border/text like above */}
-                WhatsApp Us
-              </button>
+            {/* CTA */}
+            <div className="text-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => makePhoneCall()}
+                  className="flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 hover:bg-blue-600 hover:scale-105 transition-all duration-300"
+                >
+                  <Phone className="w-5 h-5" />
+                  <span>Call Us Now</span>
+                </button>
+                <button
+                  onClick={() => openWhatsApp()}
+                  className="flex items-center justify-center gap-2 px-8 py-4 bg-white/5 text-white font-semibold rounded-xl border border-white/10 hover:bg-white/10 hover:scale-105 transition-all duration-300"
+                >
+                  <MessageCircle className="w-5 h-5 text-green-500" />
+                  <span>WhatsApp Us</span>
+                </button>
+              </div>
             </div>
           </div>
         </motion.div>
