@@ -1,242 +1,284 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, Clock, Send, MessageCircle, Loader2 } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { siteConfig } from "@/config/siteConfig";
-import { makePhoneCall, openWhatsApp } from "../utils/contactActions";
 import { useState } from "react";
-
-const formSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
-  service: z.string().min(1, "Please select a service"),
-  message: z.string().optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
+import { motion } from "framer-motion";
+import { Phone, MessageCircle, Mail, MapPin, Send, Clock } from "lucide-react";
+import { siteConfig, services } from "@/config/siteConfig";
+import { makePhoneCall, openWhatsApp } from "../utils/contactActions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 export function ContactSection() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    service: "",
+    message: "",
   });
 
-  const onSubmit = async (data: FormData) => {
-    setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Construct WhatsApp message
-    const message = `New Service Request:
-Name: ${data.name}
-Phone: ${data.phone}
-Service: ${data.service}
-Message: ${data.message || "N/A"}`;
-
-    openWhatsApp(message);
-    setIsSubmitting(false);
-    reset();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const whatsappMessage = `Hello! I need Home Appliance Repair Services\n\nName: ${formData.name}\nPhone: ${formData.phone}\nEmail: ${formData.email}\nService: ${
+      services.find((s) => s.id === formData.service)?.name || "Not specified"
+    }\nMessage: ${formData.message}`;
+    openWhatsApp(whatsappMessage);
+    alert("Thank you for your inquiry! We will contact you shortly.");
+    setFormData({ name: "", phone: "", email: "", service: "", message: "" });
   };
+
+  const handleChange = (field: string, value: string) =>
+    setFormData((prev) => ({ ...prev, [field]: value }));
 
   const contactInfo = [
     {
       icon: Phone,
-      title: "Call Us Directly",
+      title: "Phone",
       value: siteConfig.phoneNumber,
       action: () => makePhoneCall(),
-      color: "text-blue-400",
-      bg: "bg-blue-500/10",
+      color: "from-blue-500 to-blue-600",
     },
     {
       icon: MessageCircle,
-      title: "WhatsApp Chat",
+      title: "WhatsApp",
       value: "Chat with us",
       action: () => openWhatsApp(),
-      color: "text-green-400",
-      bg: "bg-green-500/10",
+      color: "from-green-500 to-green-600",
     },
     {
       icon: Mail,
-      title: "Email Us",
+      title: "Email",
       value: siteConfig.email,
       action: () => window.location.href = `mailto:${siteConfig.email}`,
-      color: "text-purple-400",
-      bg: "bg-purple-500/10",
+      color: "from-purple-500 to-purple-600",
     },
     {
       icon: MapPin,
-      title: "Service Area",
+      title: "Location",
       value: siteConfig.locations,
       action: null,
-      color: "text-orange-400",
-      bg: "bg-orange-500/10",
+      color: "from-indigo-500 to-indigo-600",
     },
   ];
 
   return (
-    <section id="contact" className="py-20 lg:py-32 bg-slate-900 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px]" />
-      </div>
-
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10 mb-6"
-          >
-            <Clock className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">24/7 Availability</span>
-          </motion.div>
-          <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-6">
-            Get Your Appliance <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">
-              Fixed Today
-            </span>
+    <section id="contact" className="py-20 lg:py-28 bg-white">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <div className="inline-block px-4 py-2 bg-blue-50 rounded-full mb-4">
+            <span className="text-sm font-semibold text-blue-600">Get In Touch</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            Contact Our Appliance Repair Center
           </h2>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-            Fast, reliable service when you need it most. Contact us now for a free quote or immediate repair.
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Get in touch with our expert technicians for professional appliance repair services in {siteConfig.locations}.
           </p>
+        </motion.div>
+
+        {/* Contact Info Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {contactInfo.map((info, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              viewport={{ once: true }}
+              className="w-full"
+            >
+              <div
+                onClick={info.action || undefined}
+                className={`w-full h-full bg-gradient-to-br ${info.color} rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${
+                  info.action ? "cursor-pointer hover:scale-105" : ""
+                }`}
+              >
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4 flex-shrink-0">
+                  <info.icon className="w-6 h-6" />
+                </div>
+                <h3 className="font-semibold mb-1">{info.title}</h3>
+                <p className="text-sm text-white/90">{info.value}</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Contact Info Cards */}
-          <div className="lg:col-span-1 space-y-6">
-            {contactInfo.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                onClick={item.action || undefined}
-                className={`p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 cursor-pointer group ${!item.action && "cursor-default"}`}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 ${item.bg} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                    <item.icon className={`w-6 h-6 ${item.color}`} />
-                  </div>
-                  <div>
-                    <h3 className="text-slate-400 text-sm font-medium mb-1">{item.title}</h3>
-                    <p className="text-white font-bold text-lg">{item.value}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-
-            {/* Emergency Banner */}
-            <div className="p-6 rounded-2xl bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/20 mt-8">
-              <h4 className="text-orange-400 font-bold mb-2 flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                Need Immediate Help?
-              </h4>
-              <p className="text-slate-300 text-sm mb-4">
-                Our emergency team is on standby 24/7 for urgent repairs.
-              </p>
-              <button
-                onClick={() => makePhoneCall()}
-                className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold transition-colors shadow-lg shadow-orange-500/20"
-              >
-                Call Emergency Line
-              </button>
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="lg:col-span-2"
           >
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-8 md:p-12 backdrop-blur-md">
-              <h3 className="text-2xl font-bold text-white mb-8">Request a Service</h3>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-300">Your Name</label>
+            <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-3xl p-8 lg:p-10 border border-gray-100">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h3>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => handleChange("name", e.target.value)}
+                    className="w-full h-12 px-4 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
+                    placeholder="Enter your name"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Phone
+                    </label>
                     <input
-                      {...register("name")}
-                      className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                      placeholder="John Doe"
+                      type="tel"
+                      required
+                      value={formData.phone}
+                      onChange={(e) => handleChange("phone", e.target.value)}
+                      className="w-full h-12 px-4 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
+                      placeholder="Your phone"
                     />
-                    {errors.name && (
-                      <p className="text-red-400 text-xs">{errors.name.message}</p>
-                    )}
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-300">Phone Number</label>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Email
+                    </label>
                     <input
-                      {...register("phone")}
-                      className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                      placeholder="050 123 4567"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => handleChange("email", e.target.value)}
+                      className="w-full h-12 px-4 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
+                      placeholder="Your email"
                     />
-                    {errors.phone && (
-                      <p className="text-red-400 text-xs">{errors.phone.message}</p>
-                    )}
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-300">Service Needed</label>
-                  <select
-                    {...register("service")}
-                    className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Service Needed
+                  </label>
+                  <Select
+                    value={formData.service}
+                    onValueChange={(value) => handleChange("service", value)}
                   >
-                    <option value="" className="bg-slate-900">Select a service...</option>
-                    <option value="Washing Machine" className="bg-slate-900">Washing Machine Repair</option>
-                    <option value="Refrigerator" className="bg-slate-900">Refrigerator Repair</option>
-                    <option value="Dishwasher" className="bg-slate-900">Dishwasher Repair</option>
-                    <option value="AC Repair" className="bg-slate-900">AC Repair</option>
-                    <option value="Oven/Stove" className="bg-slate-900">Oven/Store Repair</option>
-                    <option value="Other" className="bg-slate-900">Other</option>
-                  </select>
-                  {errors.service && (
-                    <p className="text-red-400 text-xs">{errors.service.message}</p>
-                  )}
+                    <SelectTrigger 
+                      className="w-full !h-12 !py-0 px-4 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200/50 outline-none transition-all hover:border-gray-300 data-[placeholder]:text-gray-400 text-gray-700 font-medium [&[data-size=default]]:!h-12 [&[data-size=default]]:!py-0"
+                    >
+                      <SelectValue placeholder="Select a service" />
+                    </SelectTrigger>
+                    <SelectContent 
+                      className="bg-white border-2 border-gray-200 rounded-xl shadow-2xl mt-1 max-h-[280px] overflow-y-auto z-50"
+                      position="popper"
+                    >
+                      {services.map((service) => (
+                        <SelectItem
+                          key={service.id}
+                          value={service.id}
+                          className="px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 focus:bg-blue-50 focus:text-blue-600 cursor-pointer transition-colors rounded-lg mx-1 my-0.5 font-medium text-sm"
+                        >
+                          {service.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-300">Message (Optional)</label>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Message
+                  </label>
                   <textarea
-                    {...register("message")}
+                    value={formData.message}
+                    onChange={(e) => handleChange("message", e.target.value)}
                     rows={4}
-                    className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none"
-                    placeholder="Describe your issue..."
+                    className="w-full min-h-[120px] px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all resize-none"
+                    placeholder="Tell us about your appliance issue..."
                   />
                 </div>
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-4 bg-primary hover:bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/25 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-xl hover:scale-105 transition-all duration-200"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-5 h-5" />
-                      Send Request
-                    </>
-                  )}
+                  <Send className="w-5 h-5" />
+                  <span>Send Message</span>
                 </button>
               </form>
+            </div>
+          </motion.div>
+
+          {/* Quick Contact CTA */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="space-y-6"
+          >
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl p-8 lg:p-10 text-white">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <Clock className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Need Immediate Help?</h3>
+                  <p className="text-blue-100 text-sm">We're available 24/7</p>
+                </div>
+              </div>
+              <p className="text-blue-100 mb-8 leading-relaxed">
+                Don't wait for your appliance to break down completely. Contact us now for same-day service and expert repair solutions.
+              </p>
+              <div className="space-y-4">
+                <button
+                  onClick={() => makePhoneCall()}
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white text-blue-600 font-semibold rounded-xl hover:bg-blue-50 hover:shadow-lg hover:scale-105 transition-all duration-200 group"
+                >
+                  <Phone className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <span>Call Us Now</span>
+                </button>
+                <button
+                  onClick={() => openWhatsApp()}
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl border-2 border-green-400 hover:border-green-500 hover:shadow-lg hover:scale-105 transition-all duration-200 group"
+                >
+                  <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <span>WhatsApp Us</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Additional Info */}
+            <div className="bg-slate-50 rounded-2xl p-6 border border-gray-100">
+              <h4 className="font-bold text-gray-900 mb-4">Service Hours</h4>
+              <div className="space-y-2 text-sm text-gray-600">
+                <div className="flex justify-between">
+                  <span>Monday - Friday</span>
+                  <span className="font-semibold">8:00 AM - 8:00 PM</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Saturday - Sunday</span>
+                  <span className="font-semibold">9:00 AM - 6:00 PM</span>
+                </div>
+                <div className="flex justify-between pt-2 border-t border-gray-200">
+                  <span className="font-semibold text-blue-600">Emergency Service</span>
+                  <span className="font-semibold text-blue-600">24/7 Available</span>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>

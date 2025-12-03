@@ -42,7 +42,7 @@ export function Footer() {
                   Appliance
                 </span>
                 <span className="text-sm text-slate-400 leading-none tracking-wide">
-                  Repair Website
+                  Masters UAE
                 </span>
               </div>
             </Link>
@@ -141,7 +141,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-slate-500 text-sm text-center md:text-left">
-            © {currentYear} Appliance Repair Website. All rights reserved.
+            © {currentYear} Appliance Masters UAE. All rights reserved.
           </p>
           <div className="flex items-center gap-2 text-sm text-slate-500">
             <span>Made with</span>

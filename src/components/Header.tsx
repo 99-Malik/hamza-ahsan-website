@@ -70,7 +70,7 @@ export function Header() {
                 </span>
                 <span className={`text-sm leading-none tracking-wide transition-colors ${isScrolled || isMobileMenuOpen ? "text-slate-400" : "text-slate-300 lg:text-slate-300"
                   }`}>
-                  Repair Website
+                  Masters UAE
                 </span>
               </div>
             </Link>

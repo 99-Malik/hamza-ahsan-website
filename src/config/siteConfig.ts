@@ -1,6 +1,6 @@
 export const siteConfig = {
-  companyName: "Appliance Service Center AE",
-  phoneNumber: "+971545900148",
+  companyName: "Appliance Masters UAE",
+  phoneNumber: "+971547445326",
   locations: "Dubai and Abu Dhabi",
   email: "info@appliancerepair.ae",
   address: "Business Bay, Dubai, UAE",
