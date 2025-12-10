@@ -5,6 +5,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FloatingContactButtons } from "@/components/FloatingContactButtons";
+import { googleAdsConfig } from "@/config/googleAds";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,18 +32,26 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Include gtag.js script */}
-        <Script async src="https://www.googletagmanager.com/gtag/js?id=AW-17395932761" />
+        {/* Google Ads Conversion Tracking - Google Tag */}
+        <Script 
+          async 
+          src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsConfig.tagId}`} 
+          strategy="afterInteractive"
+        />
 
-        {/* Include gtag.js initialization script */}
-        <Script dangerouslySetInnerHTML={{
-          __html: `
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'AW-17395932761');
-        ` }} />
-
+        {/* Google Tag Initialization */}
+        <Script
+          id="google-ads-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${googleAdsConfig.tagId}');
+          `,
+          }}
+        />
       </head>
       <body
         className={`${inter.variable} ${outfit.variable} antialiased bg-background text-foreground`}
