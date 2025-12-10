@@ -20,11 +20,11 @@ export function Header() {
   }, []);
 
   const navItems = [
-    { name: "Home", href: "#hero" },
-    { name: "Services", href: "#services" },
-    { name: "About", href: "#about" },
-    { name: "Testimonials", href: "#testimonials" },
-    { name: "Contact", href: "#contact" },
+    { name: "Home", href: "/" },
+    { name: "Services", href: "/#services" },
+    { name: "About", href: "/#about" },
+    { name: "Testimonials", href: "/#testimonials" },
+    { name: "Contact", href: "/#contact" },
   ];
 
   return (
@@ -78,14 +78,14 @@ export function Header() {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
               {navItems.map((item) => (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
                   className={`text-sm font-medium transition-colors hover:text-primary ${isScrolled ? "text-slate-300" : "text-slate-200"
                     }`}
                 >
                   {item.name}
-                </a>
+                </Link>
               ))}
               <button
                 onClick={() => makePhoneCall()}
@@ -117,14 +117,14 @@ export function Header() {
             >
               <div className="container mx-auto px-6 py-6 space-y-4">
                 {navItems.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
                     href={item.href}
                     className="block text-lg font-medium text-slate-200 py-2 border-b border-white/5 last:border-0"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
                 <div className="pt-4">
                   <button

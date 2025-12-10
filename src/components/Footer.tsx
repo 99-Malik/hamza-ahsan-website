@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Facebook, Instagram, Twitter, MapPin, Phone, Mail, Clock, ArrowRight, Heart } from "lucide-react";
+import { Facebook, Instagram, Twitter, MapPin, Phone, Clock, ArrowRight, Heart } from "lucide-react";
 import { siteConfig, services } from "@/config/siteConfig";
 
 export function Footer() {
@@ -85,10 +85,10 @@ export function Footer() {
           <div>
             <h4 className="text-white font-bold text-lg mb-6">Our Services</h4>
             <ul className="space-y-4">
-              {services.slice(0, 5).map((service) => (
+              {services.map((service) => (
                 <li key={service.name}>
                   <Link
-                    href="#services"
+                    href={`/appliance/${service.id}`}
                     className="text-slate-400 hover:text-primary flex items-center gap-2 group transition-colors"
                   >
                     <ArrowRight className="w-4 h-4 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
@@ -111,17 +111,6 @@ export function Footer() {
                   <p className="text-sm text-slate-500 mb-1">Phone Number</p>
                   <a href={`tel:${siteConfig.phoneNumber}`} className="text-white hover:text-primary transition-colors font-medium">
                     {siteConfig.phoneNumber}
-                  </a>
-                </div>
-              </li>
-              <li className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 text-primary">
-                  <Mail className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500 mb-1">Email Address</p>
-                  <a href={`mailto:${siteConfig.email}`} className="text-white hover:text-primary transition-colors font-medium">
-                    {siteConfig.email}
                   </a>
                 </div>
               </li>

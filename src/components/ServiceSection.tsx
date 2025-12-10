@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Phone, MessageCircle, ArrowRight, Wrench, Clock, Shield, Star } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { ImageWithFallback } from "@/components/ImageWithFallback";
@@ -108,21 +109,30 @@ export function ServicesSection() {
                     ))}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      onClick={() => makePhoneCall()}
-                      className="flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors duration-300 shadow-lg shadow-blue-500/20"
+                  <div className="space-y-3">
+                    <Link
+                      href={`/appliance/${service.id}`}
+                      className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 text-white font-semibold rounded-xl border border-white/10 hover:bg-white/10 hover:border-primary/50 transition-all duration-300 group"
                     >
-                      <Phone className="w-4 h-4" />
-                      <span>Call</span>
-                    </button>
-                    <button
-                      onClick={() => handleServiceWhatsApp(service.name)}
-                      className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 text-white font-semibold rounded-xl border border-white/10 hover:bg-white/10 transition-colors duration-300"
-                    >
-                      <MessageCircle className="w-4 h-4 text-green-500" />
-                      <span>Chat</span>
-                    </button>
+                      <span>Learn More</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => makePhoneCall()}
+                        className="flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-blue-600 transition-colors duration-300 shadow-lg shadow-blue-500/20"
+                      >
+                        <Phone className="w-4 h-4" />
+                        <span>Call</span>
+                      </button>
+                      <button
+                        onClick={() => handleServiceWhatsApp(service.name)}
+                        className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 text-white font-semibold rounded-xl border border-white/10 hover:bg-white/10 transition-colors duration-300"
+                      >
+                        <MessageCircle className="w-4 h-4 text-green-500" />
+                        <span>Chat</span>
+                      </button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
