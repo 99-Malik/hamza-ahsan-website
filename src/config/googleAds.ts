@@ -16,17 +16,15 @@ export const googleAdsConfig = {
   tagId: 'AW-17711629593',
   
   // Phone Call Conversion
-  // Replace 'YOUR_PHONE_CALL_LABEL' with your actual phone call conversion label
   phoneCallConversion: {
     id: 'AW-17711629593',
-    label: 'YOUR_PHONE_CALL_LABEL', // TODO: Replace with your actual conversion label
+    label: '4wntCP2erc8bEJmKyP1B', // Phone call conversion label from Google Ads
   },
   
   // WhatsApp Conversion
-  // Replace 'YOUR_WHATSAPP_LABEL' with your actual WhatsApp conversion label
   whatsAppConversion: {
     id: 'AW-17711629593',
-    label: 'YOUR_WHATSAPP_LABEL', // TODO: Replace with your actual conversion label
+    label: 'PkxNCI2Qs88bEJmKyP1B', // WhatsApp conversion label from Google Ads
   },
 };
 

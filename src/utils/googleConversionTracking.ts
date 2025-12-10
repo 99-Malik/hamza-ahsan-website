@@ -53,7 +53,7 @@ export const trackPhoneCallConversion = () => {
     window.gtag('event', 'conversion', {
       send_to: `${id}/${label}`,
       value: 1.0,
-      currency: 'AED', // Change to your currency if needed
+      currency: 'PKR', // Pakistani Rupees
     });
 
     console.log('Phone call conversion tracked:', { id, label });
@@ -89,7 +89,7 @@ export const trackWhatsAppConversion = () => {
     window.gtag('event', 'conversion', {
       send_to: `${id}/${label}`,
       value: 1.0,
-      currency: 'AED', // Change to your currency if needed
+      currency: 'PKR', // Pakistani Rupees
     });
 
     console.log('WhatsApp conversion tracked:', { id, label });
