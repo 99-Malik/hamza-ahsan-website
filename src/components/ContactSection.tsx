@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Phone, MessageCircle, Mail, MapPin, Send, Clock, MessageSquare } from "lucide-react";
 import { siteConfig, services } from "@/config/siteConfig";
 import { makePhoneCall, openWhatsApp } from "../utils/contactActions";
+import { setUserData, trackWhatsAppConversion } from "../utils/googleConversionTracking";
 import {
   Select,
   SelectContent,
@@ -24,6 +25,21 @@ export function ContactSection() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Set user data for enhanced conversions before tracking
+    setUserData({
+      email: formData.email,
+      phone: formData.phone,
+      name: formData.name,
+    });
+    
+    // Track WhatsApp conversion with user data
+    trackWhatsAppConversion({
+      email: formData.email,
+      phone: formData.phone,
+      name: formData.name,
+    });
+    
     const whatsappMessage = `Hello! I need Home Appliance Repair Services\n\nName: ${formData.name}\nPhone: ${formData.phone}\nEmail: ${formData.email}\nService: ${
       services.find((s) => s.id === formData.service)?.name || "Not specified"
     }\nMessage: ${formData.message}`;

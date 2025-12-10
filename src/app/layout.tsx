@@ -39,7 +39,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
 
-        {/* Google Tag Initialization */}
+        {/* Google Tag Initialization with Enhanced Conversions */}
         <Script
           id="google-ads-init"
           strategy="afterInteractive"
@@ -48,7 +48,7 @@ export default function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${googleAdsConfig.tagId}');
+            gtag('config', '${googleAdsConfig.tagId}', {'allow_enhanced_conversions': true});
           `,
           }}
         />
