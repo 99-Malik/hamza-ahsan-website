@@ -52,11 +52,11 @@ export const trackPhoneCallConversion = () => {
 
     window.gtag('event', 'conversion', {
       send_to: `${id}/${label}`,
-      value: 1.0,
+      value: 3500.0,
       currency: 'PKR', // Pakistani Rupees
     });
 
-    console.log('Phone call conversion tracked:', { id, label });
+    console.log('Phone call conversion tracked:', { id, label, value: 3500 });
   } catch (error) {
     console.error('Error tracking phone call conversion:', error);
   }
@@ -88,11 +88,11 @@ export const trackWhatsAppConversion = () => {
 
     window.gtag('event', 'conversion', {
       send_to: `${id}/${label}`,
-      value: 1.0,
+      value: 3500.0,
       currency: 'PKR', // Pakistani Rupees
     });
 
-    console.log('WhatsApp conversion tracked:', { id, label });
+    console.log('WhatsApp conversion tracked:', { id, label, value: 3500 });
   } catch (error) {
     console.error('Error tracking WhatsApp conversion:', error);
   }
