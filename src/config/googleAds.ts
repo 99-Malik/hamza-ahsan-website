@@ -13,19 +13,19 @@
 
 export const googleAdsConfig = {
   // Your Google Tag ID (should match the one in layout.tsx)
-  tagId: 'AW-17395932761',
+  tagId: 'AW-17711629593',
   
   // Phone Call Conversion
   // Replace 'YOUR_PHONE_CALL_LABEL' with your actual phone call conversion label
   phoneCallConversion: {
-    id: 'AW-17395932761',
+    id: 'AW-17711629593',
     label: 'YOUR_PHONE_CALL_LABEL', // TODO: Replace with your actual conversion label
   },
   
   // WhatsApp Conversion
   // Replace 'YOUR_WHATSAPP_LABEL' with your actual WhatsApp conversion label
   whatsAppConversion: {
-    id: 'AW-17395932761',
+    id: 'AW-17711629593',
     label: 'YOUR_WHATSAPP_LABEL', // TODO: Replace with your actual conversion label
   },
 };
